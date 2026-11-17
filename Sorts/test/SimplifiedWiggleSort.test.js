@@ -47,12 +47,22 @@ describe('simplifiedWiggleSort invariant', () => {
     }
   )
 
-  it('returns a separate result and documents QuickSelect input mutation', () => {
+  it('returns a separate result without mutating the input', () => {
     const input = [3, 1, 2]
+    const original = [...input]
     const output = simplifiedWiggleSort(input)
     expect(output).not.toBe(input)
-    expect(input).toEqual([1, 2, 3])
+    expect(input).toEqual(original)
     expect(output).toEqual([1, 3, 2])
+  })
+
+  it('handles a duplicate-heavy input that previously stalled median selection', () => {
+    const input = [-1, 3, -1, -4, -5, 0, 4, 2, 4, 5]
+    const original = [...input]
+    const output = simplifiedWiggleSort(input)
+    expect(isWiggle(output)).toBe(true)
+    expect(sortedCopy(output)).toEqual(sortedCopy(original))
+    expect(input).toEqual(original)
   })
 
   it('holds for 100 deterministic bounded arrays', () => {
