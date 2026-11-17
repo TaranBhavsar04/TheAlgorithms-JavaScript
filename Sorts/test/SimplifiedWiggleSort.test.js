@@ -25,3 +25,49 @@ describe('simplified wiggle sort', () => {
     }
   )
 })
+
+
+const isWiggle = (values) =>
+  values.every((value, index) => {
+    if (index === 0) return true
+    return index % 2 === 1
+      ? values[index - 1] <= value
+      : values[index - 1] >= value
+  })
+const sortedCopy = (values) => [...values].sort((a, b) => a - b)
+
+describe('simplifiedWiggleSort invariant', () => {
+  it.each([[3, 1, 2], [2, 2, 1], [1, 2, 3], [3, 2, 1], [7]])(
+    'preserves the multiset and wiggle order for %j',
+    (input) => {
+      const original = [...input]
+      const output = simplifiedWiggleSort(input)
+      expect(isWiggle(output)).toBe(true)
+      expect(sortedCopy(output)).toEqual(sortedCopy(original))
+    }
+  )
+
+  it('returns a separate result and documents QuickSelect input mutation', () => {
+    const input = [3, 1, 2]
+    const output = simplifiedWiggleSort(input)
+    expect(output).not.toBe(input)
+    expect(input).toEqual([1, 2, 3])
+    expect(output).toEqual([1, 3, 2])
+  })
+
+  it('holds for 100 deterministic bounded arrays', () => {
+    let seed = 20261118
+    const random = () => {
+      seed = (seed * 1664525 + 1013904223) % 4294967296
+      return seed / 4294967296
+    }
+    for (let caseIndex = 0; caseIndex < 100; caseIndex++) {
+      const length = 1 + Math.floor(random() * 20)
+      const input = Array.from({ length }, () => Math.floor(random() * 11) - 5)
+      const original = [...input]
+      const output = simplifiedWiggleSort(input)
+      expect(isWiggle(output)).toBe(true)
+      expect(sortedCopy(output)).toEqual(sortedCopy(original))
+    }
+  })
+})
